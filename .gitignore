@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Next.js Build Output
+.next/
+*/.next/
+out/
+*/out/
+build/
+*/build/
+dist/
+*/dist/
+
+# Environment Variables & Secrets (Keep .env.example tracked)
+.env
+.env*.local
+*.env
+!.env.example
+!backend/.env.example
+
+# Vercel Deployment Artifacts
+.vercel/
+*/.vercel/
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+*.tmp
+*.bak
+
+# IDE & Editor Directories (Optional developer caches)
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
