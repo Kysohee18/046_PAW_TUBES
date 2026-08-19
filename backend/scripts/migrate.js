@@ -4,9 +4,10 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const dbUrl = process.argv[2] || process.env.DATABASE_URL;
+const rawUrl = process.argv[2] || process.env.DATABASE_URL || '';
+const dbUrl = rawUrl.trim().replace(/^["']|["']$/g, '');
 
-if (!dbUrl || !dbUrl.startsWith('postgres')) {
+if (!dbUrl || (!dbUrl.startsWith('postgres://') && !dbUrl.startsWith('postgresql://'))) {
     console.error('❌ Error: DATABASE_URL is not set or invalid.');
     console.log('Usage: node scripts/migrate.js "postgres://postgres.[REF]:[PASS]@[HOST]:6543/postgres"');
     console.log('Or set DATABASE_URL in backend/.env');
@@ -20,8 +21,9 @@ const pool = new Pool({
 
 async function runMigration() {
     console.log('🔄 Connecting to PostgreSQL/Supabase database...');
-    const client = await pool.connect();
+    let client;
     try {
+        client = await pool.connect();
         console.log('📄 Reading schema.sql...');
         const schemaPath = path.join(__dirname, '..', 'schema.sql');
         const schemaSql = fs.readFileSync(schemaPath, 'utf8');
@@ -64,7 +66,7 @@ async function runMigration() {
     } catch (err) {
         console.error('❌ Migration error:', err.message);
     } finally {
-        client.release();
+        if (client) client.release();
         await pool.end();
     }
 }
