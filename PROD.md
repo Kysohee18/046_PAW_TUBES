@@ -1,26 +1,31 @@
-# 🚀 Panduan Produksi & Deployment: ReviewPulse SaaS
+# 🚀 Panduan Produksi & Deployment Vercel: ReviewPulse SaaS
 
-Dokumen ini berisi panduan komprehensif untuk merilis (*deploy*) platform **ReviewPulse SaaS** ke lingkungan produksi (**Vercel & Supabase Cloud**) serta panduan implementasi **Live Real-Time Scraping**.
-
----
-
-## 🏗️ 1. Arsitektur Produksi
-
-```
-[ Frontend: Next.js 16 ] (Vercel Edge / Serverless)
-         │
-         ▼ (HTTPS CORS API Requests)
-[ Backend: Express.js API ] (Vercel Serverless Function)
-         │
-         ├───────────────────────────────┬───────────────────────────────┐
-         ▼                               ▼                               ▼
-[ Supabase PostgreSQL ]         [ VADER NLP Engine ]           [ Scraping Upstream ]
-(Connection Pooler :6543)       (CPU-bound Local Node.js)       (RapidAPI / Official API)
-```
+Dokumen ini berisi panduan komprehensif untuk merilis (*deploy*) platform **ReviewPulse SaaS** ke lingkungan produksi (**Vercel & Supabase Cloud**) menggunakan struktur **Monorepo (1 Repository GitHub ➔ 2 Project Vercel)** serta panduan implementasi **Live Real-Time Scraping**.
 
 ---
 
-## 🗄️ 2. Langkah 1: Setup Database Supabase Cloud
+## 🏗️ 1. Arsitektur Monorepo & Deployment di Vercel
+
+Anda **TIDAK PERLU memisahkan repository GitHub**. Anda cukup menggunakan **1 repository GitHub yang sama** (`046_PAW_TUBES`), lalu di Vercel dibuat **2 Project terpisah** dengan mengatur **Root Directory**:
+
+```
+                              [ GitHub Repository ]
+                              (046_PAW_TUBES: main)
+                                        │
+                    ┌───────────────────┴───────────────────┐
+                    ▼                                       ▼
+        [ Project 1: Frontend ]                 [ Project 2: Backend ]
+        Root Directory: `frontend`              Root Directory: `backend`
+        Framework: Next.js 16                   Framework: Other / Node.js
+        URL: https://reviewpulse.vercel.app     URL: https://reviewpulse-backend.vercel.app
+                    │                                       │
+                    │         NEXT_PUBLIC_API_URL           │
+                    └───────────────────────────────────────┘
+```
+
+---
+
+## 🗄️ 2. Langkah 1: Setup Database Supabase Cloud (PostgreSQL)
 
 1. Buka [supabase.com](https://supabase.com/) dan buat project baru (Free Plan).
 2. Pilih Region terdekat (misalnya: `Singapore (ap-southeast-1)`).
@@ -31,20 +36,20 @@ Dokumen ini berisi panduan komprehensif untuk merilis (*deploy*) platform **Revi
 
 ---
 
-## ⚙️ 3. Langkah 2: Deploy Backend ke Vercel
+## ⚙️ 3. Langkah 2: Deploy Backend ke Vercel (Project 1)
 
-1. Push repository Anda ke GitHub:
+1. Pastikan kode terbaru sudah di-push ke GitHub:
    ```bash
    git add .
-   git commit -m "feat: production ready"
+   git commit -m "feat: ready for vercel production"
    git push origin main
    ```
-2. Buka [vercel.com/dashboard](https://vercel.com/dashboard) ➔ Klik **"Add New..." ➔ "Project"**.
-3. Pilih repository GitHub Anda.
-4. Pada bagian **Root Directory**, klik **Edit** dan pilih folder **`backend`**.
+2. Buka [vercel.com/dashboard](https://vercel.com/dashboard) ➔ Klik tombol **"Add New..." ➔ "Project"**.
+3. Pilih repository GitHub Anda (`046_PAW_TUBES`).
+4. **PENTING**: Pada bagian **Root Directory**, klik **Edit** dan pilih folder **`backend`**.
 5. Buka accordion **Environment Variables** dan masukkan variabel berikut:
 
-| Key | Value Contoh | Deskripsi |
+| Environment Variable | Value Contoh | Deskripsi |
 |---|---|---|
 | `DATABASE_URL` | `postgres://postgres.xxx:pass@pooler.supabase.com:6543/postgres` | URI PostgreSQL Supabase |
 | `JWT_SECRET` | `reviewpulse_production_secret_key_2026_xyz` | Kunci rahasia token JWT |
@@ -52,19 +57,20 @@ Dokumen ini berisi panduan komprehensif untuk merilis (*deploy*) platform **Revi
 
 6. Klik tombol **Deploy**.
 7. Setelah selesai, salin URL backend produksi Anda (contoh: `https://reviewpulse-backend.vercel.app`).
+8. Cek endpoint health di browser: `https://reviewpulse-backend.vercel.app/health`.
 
 ---
 
-## 🖥️ 4. Langkah 3: Deploy Frontend ke Vercel
+## 🖥️ 4. Langkah 3: Deploy Frontend ke Vercel (Project 2)
 
-1. Di Dashboard Vercel, klik **"Add New..." ➔ "Project"**.
-2. Pilih repository GitHub yang sama.
-3. Pada bagian **Root Directory**, pilih folder **`frontend`**.
+1. Kembali ke Dashboard Vercel ➔ Klik tombol **"Add New..." ➔ "Project"**.
+2. Pilih repository GitHub yang sama (`046_PAW_TUBES`).
+3. **PENTING**: Pada bagian **Root Directory**, klik **Edit** dan pilih folder **`frontend`**.
 4. Buka accordion **Environment Variables** dan masukkan:
 
-| Key | Value Contoh | Deskripsi |
+| Environment Variable | Value Contoh | Deskripsi |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | `https://reviewpulse-backend.vercel.app/api/v1` | URL Backend Vercel Anda |
+| `NEXT_PUBLIC_API_URL` | `https://reviewpulse-backend.vercel.app/api/v1` | URL Backend Vercel Anda + `/api/v1` |
 
 5. Klik tombol **Deploy**.
 6. Website frontend Anda sekarang sudah aktif dan dapat diakses publik di URL Vercel (contoh: `https://reviewpulse.vercel.app`).
@@ -98,10 +104,10 @@ Jika toko Anda terdaftar sebagai Shopee Mall / Star Seller atau Tokopedia Offici
 
 ---
 
-## 🛡️ 6. Checklist Keamanan & Monitoring Produksi
+## 🛡️ 6. Checklist Keamanan & Troubleshooting Produksi
 
-- [x] **Rate Limiter**: Telah aktif 200 request per 15 menit per IP untuk mencegah serangan DDoS (`server.js`).
-- [x] **Auth Guard**: Halaman `/dashboard/*` diproteksi secara ketat dari akses unauthenticated (`layout.tsx`).
-- [x] **Audit Trail Logging**: Setiap request yang menggunakan `X-API-KEY` dicatat ke tabel `usage_logs` lengkap dengan waktu respons.
-- [x] **Parameterized Queries**: Semua query database menggunakan parameter (`$1`, `$2`) untuk mencegah SQL Injection.
-- [x] **Dual-Mode Data Resiliency**: Jika database cloud mengalami maintenance sesaat, sistem fallback otomatis aktif untuk mencegah error 500 fatal.
+* **Masalah CORS**: `backend/server.js` sudah dilengkapi `cors()` sehingga aman dipanggil dari domain frontend Vercel manapun.
+* **Database Connection Timeout**: Gunakan **Transaction Pooler (Port 6543)** dari Supabase, bukan Direct Connection (Port 5432) untuk serverless environment.
+* **Rate Limiter**: Aktif 200 request per 15 menit per IP untuk mencegah abuse/DDoS (`server.js`).
+* **Auth Guard**: Halaman `/dashboard/*` diproteksi secara ketat dari akses unauthenticated (`layout.tsx`).
+* **Audit Trail Logging**: Setiap request yang menggunakan `X-API-KEY` dicatat ke tabel `usage_logs` lengkap dengan waktu respons.

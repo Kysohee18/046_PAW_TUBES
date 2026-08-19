@@ -426,26 +426,32 @@ Dokumentasi pengujian terperinci tersedia di file **[`TESTING.md`](TESTING.md)**
 
 ---
 
-## ☁️ Panduan Deployment (Vercel & Supabase)
+## ☁️ Panduan Deployment Monorepo (Vercel & Supabase)
 
-### 1. Deploy Database ke Supabase
+ReviewPulse SaaS menggunakan struktur **Monorepo (1 Repository GitHub ➔ 2 Project Vercel)**. Anda **tidak perlu memisahkan repository GitHub**.
+
+### 1. Setup Database di Supabase Cloud (PostgreSQL)
 1. Buat project baru di [supabase.com](https://supabase.com/).
-2. Masuk ke menu **SQL Editor**, salin isi file `backend/schema.sql`, lalu klik **Run**.
-3. Masuk ke **Settings ➔ Database ➔ Connection string (NodeJS / URI)** dan salin `DATABASE_URL`.
+2. Masuk ke menu **SQL Editor**, salin seluruh isi file `backend/schema.sql`, lalu klik **Run**.
+3. Masuk ke **Project Settings ➔ Database ➔ Connection string (Transaction Pooler - Port 6543)** dan salin `DATABASE_URL`.
 
-### 2. Deploy Backend ke Vercel
-1. Masuk ke direktori `backend/`.
-2. Pasang Vercel CLI: `npm install -g vercel`.
-3. Jalankan `vercel` dan atur Environment Variables:
-   * `DATABASE_URL`: URI Supabase Anda.
-   * `JWT_SECRET`: Kunci rahasia produksi Anda.
+### 2. Deploy Project 1: Backend Express.js di Vercel
+1. Buka [vercel.com/dashboard](https://vercel.com/dashboard) ➔ Klik **"Add New..." ➔ "Project"**.
+2. Pilih repository GitHub Anda.
+3. Pada bagian **Root Directory**, klik **Edit** dan pilih folder **`backend`**.
+4. Masukkan Environment Variables:
+   * `DATABASE_URL`: URI Supabase Transaction Pooler Anda.
+   * `JWT_SECRET`: Kunci rahasia token JWT produksi.
    * `NODE_ENV`: `production`.
+5. Klik **Deploy** dan salin URL Backend yang dihasilkan (misal: `https://reviewpulse-backend.vercel.app`).
 
-### 3. Deploy Frontend ke Vercel
-1. Masuk ke direktori `frontend/`.
-2. Jalankan `vercel`.
-3. Tambahkan Environment Variable:
-   * `NEXT_PUBLIC_API_URL`: URL backend Vercel Anda (misal: `https://your-backend.vercel.app/api/v1`).
+### 3. Deploy Project 2: Frontend Next.js di Vercel
+1. Di Dashboard Vercel, klik **"Add New..." ➔ "Project"**.
+2. Pilih repository GitHub yang sama.
+3. Pada bagian **Root Directory**, pilih folder **`frontend`**.
+4. Masukkan Environment Variable:
+   * `NEXT_PUBLIC_API_URL`: URL Backend Vercel Anda + `/api/v1` (misal: `https://reviewpulse-backend.vercel.app/api/v1`).
+5. Klik **Deploy**. Website dan REST API Anda sekarang aktif 100% di internet!
 
 ---
 
