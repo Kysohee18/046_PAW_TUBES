@@ -25,14 +25,34 @@ Anda **TIDAK PERLU memisahkan repository GitHub**. Anda cukup menggunakan **1 re
 
 ---
 
-## 🗄️ 2. Langkah 1: Setup Database Supabase Cloud (PostgreSQL)
+## 🗄️ 2. Langkah 1: Setup & Direct SQL Injection ke Database Supabase
 
-1. Buka [supabase.com](https://supabase.com/) dan buat project baru (Free Plan).
-2. Pilih Region terdekat (misalnya: `Singapore (ap-southeast-1)`).
-3. Masuk ke menu **SQL Editor**, salin seluruh isi file `backend/schema.sql`, lalu klik tombol **Run**.
-4. Masuk ke menu **Project Settings ➔ Database ➔ Connection string**:
-   * Pilih tab **URI** atau **Transaction Pooler (Port 6543)**.
-   * Salin connection string tersebut (contoh: `postgres://postgres.[REF]:[PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres`).
+Anda **TIDAK PERLU** repot copy-paste manual jika tidak mau. Kami menyediakan **3 cara mudah** untuk langsung meng-inject schema SQL ke database:
+
+### Opsi A: Direct CLI Migration (Otomatis 1 Perintah) ⭐ *Paling Praktis*
+Jalankan script migration otomatis dari terminal backend:
+```bash
+cd backend
+# Jalankan migrasi langsung dengan URI Supabase Anda:
+node scripts/migrate.js "postgres://postgres.[YOUR-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres"
+```
+> Script ini akan otomatis:
+> 1. Terhubung ke database Supabase Anda.
+> 2. Meng-inject seluruh DDL tabel (`users`, `api_keys`, `product_analyses`, `usage_logs`).
+> 3. Membuat seed akun demo bawaan (`seller@store.com` / `seller123`) & default API Key.
+
+---
+
+### Opsi B: Auto-Migration on Boot (Otomatis Saat Backend Dinyalakan)
+1. Cukup masukkan `DATABASE_URL` ke file `backend/.env` atau Environment Variables Vercel.
+2. Saat backend menyala pertama kali (`server.js`), file `database.js` akan **secara otomatis membaca `schema.sql` dan mengeksekusi pembuatan tabel di Supabase** di latar belakang.
+
+---
+
+### Opsi C: Manual via Dashboard Supabase (Opsional)
+1. Buka [supabase.com](https://supabase.com/) ➔ Masuk ke **SQL Editor**.
+2. Salin seluruh isi file `backend/schema.sql`, lalu klik tombol **Run**.
+3. Salin connection string dari **Project Settings ➔ Database ➔ Connection string (Transaction Pooler - Port 6543)**.
 
 ---
 

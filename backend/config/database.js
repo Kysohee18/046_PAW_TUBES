@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
@@ -75,8 +77,22 @@ if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgres'))
     try {
         pool = new Pool({
             connectionString: process.env.DATABASE_URL,
-            ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+            ssl: { rejectUnauthorized: false }
         });
+
+        // Automatic Zero-Config DDL injection on server startup
+        (async () => {
+            try {
+                const schemaPath = path.join(__dirname, '..', 'schema.sql');
+                if (fs.existsSync(schemaPath)) {
+                    const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+                    await pool.query(schemaSql);
+                    console.log('⚡ Auto-migration: PostgreSQL/Supabase schema verified & ready on startup!');
+                }
+            } catch (err) {
+                console.warn('Auto-migration notice:', err.message);
+            }
+        })();
     } catch (e) {
         console.warn('PostgreSQL pool init failed, falling back to Memory Store.');
         useMemoryStore = true;
