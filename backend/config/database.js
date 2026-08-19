@@ -7,7 +7,7 @@ require('dotenv').config();
 let pool = null;
 let useMemoryStore = false;
 
-// In-Memory Store for instant zero-config operations & offline development
+// In-Memory Store for fallback
 const memoryStore = {
     users: [
         {
@@ -73,28 +73,36 @@ let keySeq = 2;
 let analysisSeq = 2;
 let logSeq = 1;
 
-if (process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgres')) {
+const rawDbUrl = (process.env.DATABASE_URL || '').trim().replace(/^["']|["']$/g, '');
+
+if (rawDbUrl && (rawDbUrl.startsWith('postgres://') || rawDbUrl.startsWith('postgresql://'))) {
     try {
         pool = new Pool({
-            connectionString: process.env.DATABASE_URL,
-            ssl: { rejectUnauthorized: false }
+            connectionString: rawDbUrl,
+            ssl: { rejectUnauthorized: false },
+            connectionTimeoutMillis: 10000,
+            idleTimeoutMillis: 30000
         });
 
-        // Automatic Zero-Config DDL injection on server startup
+        // Test connection & Auto-migration
         (async () => {
             try {
+                const client = await pool.connect();
+                console.log('✅ PostgreSQL / Supabase Pool connected successfully!');
                 const schemaPath = path.join(__dirname, '..', 'schema.sql');
                 if (fs.existsSync(schemaPath)) {
                     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-                    await pool.query(schemaSql);
-                    console.log('⚡ Auto-migration: PostgreSQL/Supabase schema verified & ready on startup!');
+                    await client.query(schemaSql);
+                    console.log('⚡ Schema tables verified in PostgreSQL/Supabase!');
                 }
+                client.release();
             } catch (err) {
-                console.warn('Auto-migration notice:', err.message);
+                console.warn('⚠️ Supabase connection warning, operating in fallback mode:', err.message);
+                useMemoryStore = true;
             }
         })();
     } catch (e) {
-        console.warn('PostgreSQL pool init failed, falling back to Memory Store.');
+        console.warn('⚠️ PostgreSQL pool init error, using Memory Store:', e.message);
         useMemoryStore = true;
     }
 } else {
@@ -107,11 +115,11 @@ const db = {
             try {
                 return await pool.query(text, params);
             } catch (err) {
-                console.warn('PostgreSQL query error, falling back to Memory Store:', err.message);
+                console.warn('PostgreSQL query notice (falling back to memory):', err.message);
             }
         }
 
-        // Clean & Normalize SQL command
+        // Clean & Normalize SQL command for memory fallback
         const sql = text.trim().replace(/\s+/g, ' ');
 
         // 1. SELECT users by email
@@ -259,7 +267,6 @@ const db = {
             return { rows: [newLog] };
         }
 
-        // Default empty result
         return { rows: [] };
     }
 };
