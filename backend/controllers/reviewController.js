@@ -1,4 +1,4 @@
-const db = require('../config/database');
+const db = require('../models');
 const { fetchProductReviews } = require('../services/reviewFetcher');
 const { analyzeReviewSentiment, extractProductFlaws, calculateFeatureCsat, generateActionItems } = require('../services/aiAnalyzer');
 
@@ -11,20 +11,25 @@ const analyzeReviews = async (req, res) => {
             return res.status(400).json({ status: 'error', message: 'Keyword is required' });
         }
 
-        const cachedQuery = 'SELECT * FROM product_analyses WHERE keyword = $1 ORDER BY created_at DESC LIMIT 1';
-        const cachedRes = await db.query(cachedQuery, [keyword.toLowerCase()]);
+        const cached = await db.ProductAnalysis.findOne({
+            where: { keyword: keyword.toLowerCase() },
+            order: [['created_at', 'DESC']]
+        });
 
-        if (cachedRes.rows.length > 0) {
-            const cached = cachedRes.rows[0];
+        if (cached) {
             const ageHours = (new Date() - new Date(cached.created_at)) / (1000 * 60 * 60);
 
             if (ageHours < 24) {
-                // Log usage
+                // Record usage log
                 if (req.apiKey) {
-                    await db.query(
-                        'INSERT INTO usage_logs (user_id, api_key_id, endpoint, method, response_time, status_code) VALUES ($1, $2, $3, $4, $5, $6)',
-                        [req.apiKey.user_id || 1, req.apiKey.id || 1, '/api/v1/review/analyze', 'POST', (Date.now() - startTime) / 1000, 200]
-                    );
+                    await db.UsageLog.create({
+                        user_id: req.apiKey.user_id || 1,
+                        api_key_id: req.apiKey.id || 1,
+                        endpoint: '/api/v1/review/analyze',
+                        method: 'POST',
+                        response_time: (Date.now() - startTime) / 1000,
+                        status_code: 200
+                    });
                 }
 
                 return res.status(200).json({
@@ -41,40 +46,36 @@ const analyzeReviews = async (req, res) => {
         const featureCsat = calculateFeatureCsat(reviews, sentiment.averageCsat);
         const actionItems = generateActionItems(flaws);
 
-        const insertQuery = `
-            INSERT INTO product_analyses 
-            (keyword, product_name, platform, total_reviews, positive_count, negative_count, neutral_count, average_csat, flaws_detected, feature_csat, ai_action_items)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-            RETURNING *;
-        `;
-        const values = [
-            keyword.toLowerCase(),
-            productName || keyword,
+        const newAnalysis = await db.ProductAnalysis.create({
+            keyword: keyword.toLowerCase(),
+            product_name: productName || keyword,
             platform,
-            sentiment.total,
-            sentiment.positive,
-            sentiment.negative,
-            sentiment.neutral,
-            sentiment.averageCsat,
-            JSON.stringify(flaws),
-            JSON.stringify(featureCsat),
-            JSON.stringify(actionItems)
-        ];
-
-        const { rows } = await db.query(insertQuery, values);
+            total_reviews: sentiment.total,
+            positive_count: sentiment.positive,
+            negative_count: sentiment.negative,
+            neutral_count: sentiment.neutral,
+            average_csat: sentiment.averageCsat,
+            flaws_detected: flaws,
+            feature_csat: featureCsat,
+            ai_action_items: actionItems
+        });
 
         // Record usage log
         if (req.apiKey) {
-            await db.query(
-                'INSERT INTO usage_logs (user_id, api_key_id, endpoint, method, response_time, status_code) VALUES ($1, $2, $3, $4, $5, $6)',
-                [req.apiKey.user_id || 1, req.apiKey.id || 1, '/api/v1/review/analyze', 'POST', (Date.now() - startTime) / 1000, 200]
-            );
+            await db.UsageLog.create({
+                user_id: req.apiKey.user_id || 1,
+                api_key_id: req.apiKey.id || 1,
+                endpoint: '/api/v1/review/analyze',
+                method: 'POST',
+                response_time: (Date.now() - startTime) / 1000,
+                status_code: 200
+            });
         }
 
         return res.status(200).json({
             status: 'success',
             cached: false,
-            data: rows[0]
+            data: newAnalysis
         });
     } catch (err) {
         return res.status(500).json({ status: 'error', message: err.message });
@@ -83,13 +84,14 @@ const analyzeReviews = async (req, res) => {
 
 const getReviewHistory = async (req, res) => {
     try {
-        const query = 'SELECT * FROM product_analyses ORDER BY created_at DESC';
-        const { rows } = await db.query(query);
+        const history = await db.ProductAnalysis.findAll({
+            order: [['created_at', 'DESC']]
+        });
 
         return res.status(200).json({
             status: 'success',
-            total: rows.length,
-            history: rows
+            total: history.length,
+            history
         });
     } catch (err) {
         return res.status(500).json({ status: 'error', message: err.message });

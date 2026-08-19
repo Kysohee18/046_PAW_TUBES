@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const db = require('../config/database');
+const db = require('../models');
 
 const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -26,23 +26,23 @@ const verifyApiKey = async (req, res, next) => {
     }
 
     try {
-        const query = 'SELECT * FROM api_keys WHERE key = $1 AND is_active = TRUE';
-        const { rows } = await db.query(query, [apiKey]);
+        const keyRecord = await db.ApiKey.findOne({
+            where: { key: apiKey, is_active: true }
+        });
 
-        if (rows.length === 0) {
+        if (!keyRecord) {
             return res.status(403).json({ status: 'error', message: 'Invalid or Inactive API Key' });
         }
 
-        const keyData = rows[0];
-
-        if (keyData.usage_count >= keyData.usage_limit) {
+        if (keyRecord.usage_count >= keyRecord.usage_limit) {
             return res.status(429).json({ status: 'error', message: 'API Key Usage Limit Exceeded' });
         }
 
         // Increment usage count and update last_used timestamp
-        await db.query('UPDATE api_keys SET usage_count = usage_count + 1 WHERE key = $1', [apiKey]);
+        await keyRecord.increment('usage_count', { by: 1 });
+        await keyRecord.update({ last_used: new Date() });
 
-        req.apiKey = keyData;
+        req.apiKey = keyRecord;
         next();
     } catch (err) {
         return res.status(500).json({ status: 'error', message: err.message });

@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const pool = require('../config/database');
+const db = require('../models');
 
 const createApiKey = async (req, res) => {
     try {
@@ -9,17 +9,20 @@ const createApiKey = async (req, res) => {
         const rawKey = `rp_${crypto.randomBytes(24).toString('hex')}`;
         const keyPrefix = rawKey.substring(0, 8);
 
-        const query = `
-            INSERT INTO api_keys (user_id, key, name, key_prefix, usage_limit)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING id, name, key, key_prefix, usage_limit, usage_count, is_active, created_at;
-        `;
-        const { rows } = await pool.query(query, [userId, rawKey, name || 'Default Key', keyPrefix, 1000]);
+        const newKey = await db.ApiKey.create({
+            user_id: userId,
+            key: rawKey,
+            name: name || 'Default Key',
+            key_prefix: keyPrefix,
+            usage_limit: 1000,
+            usage_count: 0,
+            is_active: true
+        });
 
         return res.status(201).json({
             status: 'success',
             message: 'API Key generated successfully',
-            apiKey: rows[0]
+            apiKey: newKey
         });
     } catch (err) {
         return res.status(500).json({ status: 'error', message: err.message });
@@ -29,12 +32,14 @@ const createApiKey = async (req, res) => {
 const getUserApiKeys = async (req, res) => {
     try {
         const userId = req.user.id;
-        const query = 'SELECT id, name, key_prefix, usage_limit, usage_count, is_active, created_at, last_used FROM api_keys WHERE user_id = $1 ORDER BY created_at DESC';
-        const { rows } = await pool.query(query, [userId]);
+        const apiKeys = await db.ApiKey.findAll({
+            where: { user_id: userId },
+            order: [['created_at', 'DESC']]
+        });
 
         return res.status(200).json({
             status: 'success',
-            apiKeys: rows
+            apiKeys
         });
     } catch (err) {
         return res.status(500).json({ status: 'error', message: err.message });
@@ -46,12 +51,15 @@ const revokeApiKey = async (req, res) => {
         const userId = req.user.id;
         const { keyId } = req.params;
 
-        const query = 'UPDATE api_keys SET is_active = FALSE WHERE id = $1 AND user_id = $2 RETURNING *';
-        const { rows } = await pool.query(query, [keyId, userId]);
+        const keyRecord = await db.ApiKey.findOne({
+            where: { id: keyId, user_id: userId }
+        });
 
-        if (rows.length === 0) {
+        if (!keyRecord) {
             return res.status(404).json({ status: 'error', message: 'API key not found' });
         }
+
+        await keyRecord.update({ is_active: false });
 
         return res.status(200).json({
             status: 'success',
