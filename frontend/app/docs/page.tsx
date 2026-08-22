@@ -15,24 +15,71 @@ export default function DocsPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const curlExample = `curl -X POST http://localhost:8000/api/v1/review/analyze \\
+  const curlExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/review/analyze \\
   -H "X-API-KEY: rp_demo_key_1234567890" \\
   -H "Content-Type: application/json" \\
   -d '{
     "keyword": "Headphone Wireless Bluetooth",
+    "productName": "Headphone Wireless Bluetooth ANC",
     "platform": "shopee"
   }'`;
 
   const nodeExample = `const axios = require('axios');
 
-const response = await axios.post('http://localhost:8000/api/v1/review/analyze', {
+const response = await axios.post('https://reviewpulse-backend.vercel.app/api/v1/review/analyze', {
   keyword: 'Headphone Wireless Bluetooth',
+  productName: 'Headphone Wireless Bluetooth ANC',
   platform: 'shopee'
 }, {
   headers: { 'X-API-KEY': 'rp_demo_key_1234567890' }
 });
 
 console.log(response.data);`;
+
+  const registerExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/auth/register \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "email": "seller@store.com",
+    "password": "seller123",
+    "fullName": "Demo Seller",
+    "companyName": "TechStore ID"
+  }'`;
+
+  const loginExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/auth/login \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "email": "seller@store.com",
+    "password": "seller123"
+  }'`;
+
+  const createKeyExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/user/api-keys \\
+  -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \\
+  -H "Content-Type: application/json" \\
+  -d '{ "name": "My Integration Key" }'`;
+
+  const responseExample = `{
+  "status": "success",
+  "cached": false,
+  "data": {
+    "id": 6,
+    "keyword": "headphone wireless bluetooth",
+    "product_name": "Headphone Wireless Bluetooth ANC",
+    "platform": "shopee",
+    "total_reviews": 15,
+    "positive_count": 4,
+    "negative_count": 3,
+    "neutral_count": 8,
+    "average_csat": "3.53",
+    "flaws_detected": [
+      { "aspect": "shipping", "count": 9, "severity": "high", "note": "..." }
+    ],
+    "feature_csat": { "battery": 3.57, "shipping": 3.29 },
+    "ai_action_items": [
+      { "aspect": "shipping", "severity": "high", "recommendation": "..." }
+    ],
+    "created_at": "2026-08-22T14:31:59.909Z"
+  }
+}`;
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 font-sans">
@@ -84,10 +131,28 @@ console.log(response.data);`;
             <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-semibold px-2">Endpoints Reference</span>
             <nav className="space-y-0.5 text-xs font-medium">
               <button
+                onClick={() => setActiveSection('auth-endpoints')}
+                className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'auth-endpoints' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+              >
+                POST /auth/register, /auth/login
+              </button>
+              <button
+                onClick={() => setActiveSection('apikey-endpoints')}
+                className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'apikey-endpoints' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+              >
+                POST /user/api-keys
+              </button>
+              <button
                 onClick={() => setActiveSection('endpoints')}
                 className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'endpoints' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
               >
                 POST /review/analyze
+              </button>
+              <button
+                onClick={() => setActiveSection('errors')}
+                className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'errors' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+              >
+                Error Codes
               </button>
             </nav>
           </div>
@@ -137,13 +202,43 @@ console.log(response.data);`;
             </div>
           </section>
 
+          {/* Section: Auth endpoints */}
+          <section id="auth-endpoints" className="space-y-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-8">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              <Shield className="h-5 w-5 text-cyan-500" /> POST /api/v1/auth/register &amp; /auth/login
+            </h2>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              Create a seller account and exchange credentials for a JWT. The token is required (as a <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">Bearer</code> header) for API key management routes below &mdash; it does <span className="font-semibold">not</span> authorize <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">/review/analyze</code>, which uses <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">X-API-KEY</code> instead.
+            </p>
+            <div className="space-y-2">
+              <span className="text-xs font-mono text-zinc-500 uppercase font-semibold">Register</span>
+              <pre className="bg-[#09090b] text-emerald-400 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto">{registerExample}</pre>
+            </div>
+            <div className="space-y-2 pt-2">
+              <span className="text-xs font-mono text-zinc-500 uppercase font-semibold">Login</span>
+              <pre className="bg-[#09090b] text-emerald-400 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto">{loginExample}</pre>
+              <p className="text-[11px] text-zinc-500">Response returns <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">token</code> &mdash; save it to call <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">/user/api-keys</code>.</p>
+            </div>
+          </section>
+
+          {/* Section: API key management */}
+          <section id="apikey-endpoints" className="space-y-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-8">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              <Key className="h-5 w-5 text-cyan-500" /> POST /api/v1/user/api-keys
+            </h2>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              Generate an <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">X-API-KEY</code> for your account (JWT-protected). Also available: <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">GET /user/api-keys</code> (list) and <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">DELETE /user/api-keys/:keyId</code> (revoke).
+            </p>
+            <pre className="bg-[#09090b] text-emerald-400 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto">{createKeyExample}</pre>
+          </section>
+
           {/* Section: Endpoint POST /review/analyze */}
           <section id="endpoints" className="space-y-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-8">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
               <Terminal className="h-5 w-5 text-cyan-500" /> POST /api/v1/review/analyze
             </h2>
             <p className="text-xs text-zinc-600 dark:text-zinc-400">
-              Extract product complaint flaws and calculate CSAT ratings for a specific product keyword or store URL.
+              Extract product complaint flaws and calculate CSAT ratings for a specific product keyword or store URL. Results are cached for 24 hours per keyword &mdash; repeat calls return <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">cached: true</code> instantly. See also <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">GET /review/history</code> for past analyses.
             </p>
 
             {/* Code Box: cURL */}
@@ -178,6 +273,41 @@ console.log(response.data);`;
               <pre className="bg-[#09090b] text-zinc-300 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto">
                 {nodeExample}
               </pre>
+            </div>
+
+            {/* Code Box: Response */}
+            <div className="space-y-2 pt-2">
+              <span className="text-xs font-mono text-zinc-500 uppercase font-semibold">200 OK Response</span>
+              <pre className="bg-[#09090b] text-zinc-300 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto">
+                {responseExample}
+              </pre>
+            </div>
+          </section>
+
+          {/* Section: Error codes */}
+          <section id="errors" className="space-y-4">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              <HelpCircle className="h-5 w-5 text-rose-500" /> Error Codes
+            </h2>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              Every error follows the same envelope: <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">{`{ "status": "error", "message": "..." }`}</code>.
+            </p>
+            <div className="overflow-x-auto border border-zinc-200 dark:border-zinc-800 rounded-lg">
+              <table className="w-full text-xs">
+                <thead className="bg-zinc-100 dark:bg-zinc-900 text-zinc-500">
+                  <tr>
+                    <th className="text-left px-4 py-2 font-mono">Status</th>
+                    <th className="text-left px-4 py-2 font-mono">Meaning</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                  <tr><td className="px-4 py-2 font-mono text-amber-500">400</td><td className="px-4 py-2 text-zinc-600 dark:text-zinc-400">Missing required field (e.g. keyword, email, password)</td></tr>
+                  <tr><td className="px-4 py-2 font-mono text-rose-500">401</td><td className="px-4 py-2 text-zinc-600 dark:text-zinc-400">Missing Authorization Bearer token or X-API-KEY header</td></tr>
+                  <tr><td className="px-4 py-2 font-mono text-rose-500">403</td><td className="px-4 py-2 text-zinc-600 dark:text-zinc-400">Invalid/expired JWT or inactive/invalid API key</td></tr>
+                  <tr><td className="px-4 py-2 font-mono text-orange-500">429</td><td className="px-4 py-2 text-zinc-600 dark:text-zinc-400">API key usage limit exceeded, or rate limit (200 req/15min) hit</td></tr>
+                  <tr><td className="px-4 py-2 font-mono text-red-600">500</td><td className="px-4 py-2 text-zinc-600 dark:text-zinc-400">Internal server error</td></tr>
+                </tbody>
+              </table>
             </div>
           </section>
         </main>
