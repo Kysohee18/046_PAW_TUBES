@@ -15,7 +15,7 @@ export default function DocsPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const curlExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/review/analyze \\
+  const curlExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/review/analyze \\
   -H "X-API-KEY: rp_demo_key_1234567890" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -26,7 +26,7 @@ export default function DocsPage() {
 
   const nodeExample = `const axios = require('axios');
 
-const response = await axios.post('https://reviewpulse-backend.vercel.app/api/v1/review/analyze', {
+const response = await axios.post('https://046-paw-tubes.vercel.app/api/v1/review/analyze', {
   keyword: 'Headphone Wireless Bluetooth',
   productName: 'Headphone Wireless Bluetooth ANC',
   platform: 'shopee'
@@ -36,7 +36,7 @@ const response = await axios.post('https://reviewpulse-backend.vercel.app/api/v1
 
 console.log(response.data);`;
 
-  const registerExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/auth/register \\
+  const registerExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/auth/register \\
   -H "Content-Type: application/json" \\
   -d '{
     "email": "seller@store.com",
@@ -45,14 +45,14 @@ console.log(response.data);`;
     "companyName": "TechStore ID"
   }'`;
 
-  const loginExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/auth/login \\
+  const loginExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/auth/login \\
   -H "Content-Type: application/json" \\
   -d '{
     "email": "seller@store.com",
     "password": "seller123"
   }'`;
 
-  const createKeyExample = `curl -X POST https://reviewpulse-backend.vercel.app/api/v1/user/api-keys \\
+  const createKeyExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/user/api-keys \\
   -H "Authorization: Bearer <YOUR_JWT_TOKEN>" \\
   -H "Content-Type: application/json" \\
   -d '{ "name": "My Integration Key" }'`;
