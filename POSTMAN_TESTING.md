@@ -10,9 +10,11 @@ Buat Postman Environment baru (`ReviewPulse Dev` / `ReviewPulse Prod`) dengan va
 
 | Variable | Dev Value | Prod Value |
 |---|---|---|
-| `base_url` | `http://localhost:8000/api/v1` | `https://reviewpulse-backend.vercel.app/api/v1` |
+| `base_url` | `http://localhost:8000/api/v1` | `https://046-paw-tubes.vercel.app/api/v1` |
 | `api_key` | `rp_demo_key_1234567890` | (isi dari hasil step 4 di bawah) |
 | `jwt_token` | (kosong, diisi otomatis step 3) | (kosong, diisi otomatis step 3) |
+
+> Backend production sudah live & publik (dites 2026-08-22): `https://046-paw-tubes.vercel.app/health` → `"status":"healthy"`. Frontend production: `https://046-paw-tubes-gjac.vercel.app`.
 
 Semua request di bawah pakai `{{base_url}}`, `{{api_key}}`, `{{jwt_token}}`.
 
@@ -131,10 +133,15 @@ Screenshot bagian ini bagus buat lampiran laporan tugas (bukti error handling ja
 
 ## 8. Testing ke Vercel Production
 
-1. Deploy dulu (lihat `PROD.md`).
-2. Ganti Postman environment aktif ke `ReviewPulse Prod` (base_url ke domain Vercel backend).
-3. Ulangi step 2-6 di atas — response harus identik strukturnya dengan dev.
-4. Cek `GET {{base_url}}/../health` (root, bukan `/api/v1`) → pastikan `"status": "healthy"` sebelum test lanjut, biar tau backend sudah nyala & connect ke Supabase.
+Backend & frontend sudah live, sudah dites end-to-end:
+
+- Backend: `https://046-paw-tubes.vercel.app` — `GET /health` → `{"status":"healthy",...}`
+- Frontend: `https://046-paw-tubes-gjac.vercel.app` — sudah connect ke backend di atas lewat `NEXT_PUBLIC_API_URL`
+
+Langkah:
+1. Ganti Postman environment aktif ke `ReviewPulse Prod` (`base_url = https://046-paw-tubes.vercel.app/api/v1`).
+2. Cek dulu `GET https://046-paw-tubes.vercel.app/health` (root, bukan `/api/v1`) → pastikan `"status": "healthy"`.
+3. Ulangi step 2-6 di atas — response harus identik strukturnya dengan dev, cuma datanya kesimpan ke Supabase production (bukan dev database lokal).
 
 ---
 
