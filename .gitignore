@@ -27,6 +27,10 @@ dist/
 .vercel/
 */.vercel/
 
+# Markdown docs (keep only README.md tracked)
+*.md
+!README.md
+
 # Operating System Files
 .DS_Store
 Thumbs.db
