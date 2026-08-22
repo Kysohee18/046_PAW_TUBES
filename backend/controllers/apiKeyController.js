@@ -34,6 +34,7 @@ const getUserApiKeys = async (req, res) => {
         const userId = req.user.id;
         const apiKeys = await db.ApiKey.findAll({
             where: { user_id: userId },
+            attributes: { exclude: ['key'] },
             order: [['created_at', 'DESC']]
         });
 

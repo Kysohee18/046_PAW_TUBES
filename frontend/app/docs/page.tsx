@@ -189,7 +189,7 @@ console.log(response.data);`;
               <Key className="h-5 w-5 text-emerald-500" /> API Authentication
             </h2>
             <p className="text-xs text-zinc-600 dark:text-zinc-400">
-              All API requests must contain your secret developer key passed in the <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">X-API-KEY</code> HTTP header.
+              All requests to <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">/review/*</code> endpoints must contain your secret key in the <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">X-API-KEY</code> HTTP header. Get your key from the <Link href="/dashboard/api-keys" className="text-emerald-600 dark:text-emerald-400 underline">Dashboard &rarr; Developer Tokens</Link> page (requires login).
             </p>
             <div className="bg-[#121215] text-zinc-300 p-4 rounded-lg font-mono text-xs border border-zinc-800 flex items-center justify-between">
               <span>X-API-KEY: rp_demo_key_1234567890</span>
@@ -199,6 +199,25 @@ console.log(response.data);`;
               >
                 {copiedCode === 'key' ? 'Copied!' : 'Copy Header'}
               </button>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-3 pt-2">
+              <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 space-y-1.5">
+                <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-500" /> Shown once</span>
+                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">The full key is displayed <span className="font-semibold">only at creation time</span>. We never store or return the raw key again &mdash; the dashboard and API only expose the key prefix afterward. Lost it? Revoke and generate a new one.</p>
+              </div>
+              <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 space-y-1.5">
+                <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-500" /> Server-side only</span>
+                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Never embed your key in frontend/mobile code or commit it to a public repo. Call this API from your backend, and pass results to your client &mdash; same rule as Stripe or OpenAI secret keys.</p>
+              </div>
+              <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 space-y-1.5">
+                <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-500" /> Per-key quota</span>
+                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Each key has its own <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">usage_limit</code> (default 1000 calls). Track consumption in the dashboard; requests past the limit get <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">429</code>.</p>
+              </div>
+              <div className="p-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40 space-y-1.5">
+                <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5"><Shield className="h-3.5 w-3.5 text-emerald-500" /> Revoke anytime</span>
+                <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">Revoking a key is immediate and irreversible (<code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">is_active: false</code>). Use a separate key per integration/environment so you can revoke one without breaking others.</p>
+              </div>
             </div>
           </section>
 
