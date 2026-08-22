@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Key, Plus, Copy, Check, ShieldCheck, Trash2, RefreshCw } from 'lucide-react';
+import { Key, Plus, ShieldCheck, Trash2, RefreshCw } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function ApiKeysPage() {
@@ -11,7 +11,6 @@ export default function ApiKeysPage() {
   const [keyName, setKeyName] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
-  const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const fetchKeys = async () => {
     setLoading(true);
@@ -58,12 +57,6 @@ export default function ApiKeysPage() {
     }
   };
 
-  const handleCopy = (id: number, keyText: string) => {
-    navigator.clipboard.writeText(keyText);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
   return (
     <div className="space-y-8 font-sans text-sm">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-5">
@@ -97,6 +90,9 @@ export default function ApiKeysPage() {
                   <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Your New API Key:</span>
                   <div className="font-mono text-xs text-zinc-900 dark:text-white break-all select-all font-bold">{newlyCreatedKey}</div>
                 </div>
+                <p className="text-[11px] text-rose-500 dark:text-rose-400 font-medium">
+                  ⚠ Copy it now — this is the only time the full key is shown. After you close this dialog, only the key prefix is visible.
+                </p>
                 <button
                   onClick={() => { navigator.clipboard.writeText(newlyCreatedKey); setShowModal(false); }}
                   className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg text-xs"
@@ -187,15 +183,6 @@ export default function ApiKeysPage() {
                     </span>
                   </td>
                   <td className="p-3.5 text-right space-x-2">
-                    {k.key && (
-                      <button
-                        onClick={() => handleCopy(k.id, k.key)}
-                        className="px-2.5 py-1 bg-zinc-100 dark:bg-[#18181b] hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded border border-zinc-200 dark:border-zinc-700/60 inline-flex items-center gap-1 text-xs"
-                      >
-                        {copiedId === k.id ? <Check className="h-3 w-3 text-emerald-500" /> : <Copy className="h-3 w-3" />}
-                        {copiedId === k.id ? 'Copied' : 'Copy'}
-                      </button>
-                    )}
                     {k.is_active && (
                       <button
                         onClick={() => handleRevoke(k.id)}
