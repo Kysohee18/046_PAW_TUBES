@@ -3,20 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { ArrowRight, BarChart2, Shield, Zap, Check, Star } from 'lucide-react';
+import { ArrowRight, BarChart2, Shield, Check, Star } from 'lucide-react';
+
+// Trust bar / logo cloud: e-commerce platforms reviews are sourced from.
+// Static config: { name, logo }. Swap/extend this array to add platforms.
+const DATA_SOURCES = [
+  { name: 'Shopee', logo: '/logos/shopee.svg' },
+  { name: 'Tokopedia', logo: '/logos/tokopedia.svg' },
+  { name: 'Amazon', logo: '/logos/amazon.svg' },
+  { name: 'Shopify', logo: '/logos/shopify.svg' },
+  { name: 'Lazada', logo: '/logos/lazada.svg' },
+  { name: 'TikTok Shop', logo: '/logos/tiktokshop.svg' },
+  { name: 'Blibli', logo: '/logos/blibli.svg' },
+];
 
 export default function LandingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
-
-  const sources = [
-    { name: 'Shopee', logo: '/logos/shopee.svg', color: 'text-[#ee4d2d]' },
-    { name: 'Tokopedia', logo: '/logos/tokopedia.svg', color: 'text-[#42b549]' },
-    { name: 'Amazon', logo: '/logos/amazon.svg', color: 'text-[#ff9900]' },
-    { name: 'Shopify', logo: '/logos/shopify.svg', color: 'text-[#95bf47]' },
-    { name: 'Lazada', logo: '/logos/lazada.svg', color: 'text-[#F57224] dark:text-[#00F2FE]' },
-    { name: 'TikTok Shop', logo: '/logos/tiktokshop.svg', color: 'text-[#ff0050]' },
-    { name: 'Blibli', logo: '/logos/blibli.svg', color: 'text-[#0095da]' },
-  ];
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 font-sans">
@@ -78,29 +80,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Full-Color Permanent Marquee Logos (Hover Reveals Brand Name Text) */}
-      <section id="sources" className="w-full overflow-hidden border-y border-zinc-200 dark:border-zinc-800/80 bg-zinc-100/80 dark:bg-[#0c0c0e] py-12">
-        <div className="max-w-6xl mx-auto px-8 mb-8 text-center">
-          <p className="text-xs font-mono uppercase tracking-widest text-zinc-600 dark:text-zinc-400 font-bold">
-            Trusted E-Commerce Review Data Sources & Official Platform Integrations
+      {/* Trust Bar / Logo Cloud — e-commerce platforms reviews are sourced from */}
+      <section id="sources" className="py-14 px-8 bg-zinc-100/70 dark:bg-[#0c0c0e] border-y border-zinc-200 dark:border-zinc-800/80">
+        <div className="max-w-5xl mx-auto text-center space-y-8">
+          {/* NOTE: "50.000+ pengguna" is a placeholder figure for demo/mockup
+              purposes only — not a real production metric. Swap once actual
+              usage data is available. */}
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+            Dipercaya oleh 50.000+ Pengguna untuk Mengelola Proses Mereka
           </p>
-        </div>
 
-        <div className="relative flex overflow-x-hidden group">
-          <div className="animate-marquee whitespace-nowrap flex items-center gap-8 px-8">
-            {[...sources, ...sources, ...sources].map((source, index) => (
+          <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6">
+            {DATA_SOURCES.map((source) => (
               <div
-                key={index}
-                className="group/card flex-shrink-0 p-3.5 rounded-xl bg-white dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 shadow-sm flex items-center transition-all duration-300 hover:scale-110 hover:border-emerald-500/60 dark:hover:border-emerald-500/60 cursor-pointer"
+                key={source.name}
+                className="flex items-center gap-2 grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
               >
-                <img
-                  src={source.logo}
-                  alt={source.name}
-                  className="h-8 w-8 object-contain transition-all duration-300"
-                />
-                <span className={`font-mono text-sm font-bold tracking-tight opacity-0 max-w-0 overflow-hidden whitespace-nowrap group-hover/card:opacity-100 group-hover/card:max-w-[150px] group-hover/card:ml-3 transition-all duration-300 ease-in-out ${source.color}`}>
-                  {source.name}
-                </span>
+                <img src={source.logo} alt={source.name} className="h-6 w-6 shrink-0 object-contain" />
+                <span className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">{source.name}</span>
               </div>
             ))}
           </div>
