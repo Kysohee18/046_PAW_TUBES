@@ -2,9 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Terminal, Key, ArrowLeft, Copy, Check, Shield, HelpCircle } from 'lucide-react';
+import { Terminal, Key, Copy, Check, Shield, HelpCircle } from 'lucide-react';
 
 const NAV_SECTIONS = [
   { group: 'Getting Started', items: [
@@ -20,7 +19,6 @@ const NAV_SECTIONS = [
 ];
 
 export default function DocsPage() {
-  const router = useRouter();
   const [activeSection, setActiveSection] = useState('overview');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -122,12 +120,6 @@ console.log(data.data.flaws_detected);`;
 
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <button
-              onClick={() => router.push(localStorage.getItem('rp_token') ? '/dashboard' : '/login')}
-              className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white font-medium"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
-            </button>
           </div>
         </div>
       </header>

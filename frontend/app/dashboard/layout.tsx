@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { LayoutDashboard, History, Key, BookOpen, LogOut, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, History, Key, LogOut } from 'lucide-react';
 
 export default function DashboardLayout({
   children,
@@ -81,17 +81,6 @@ export default function DashboardLayout({
               }`}
             >
               <Key className="h-4 w-4" /> Developer Tokens
-            </Link>
-
-            <Link
-              href="/docs"
-              className={`flex items-center gap-2.5 px-3 py-2 rounded font-medium border transition-colors ${
-                pathname === '/docs'
-                  ? 'bg-zinc-100 dark:bg-zinc-800/60 text-zinc-900 dark:text-white border-zinc-200 dark:border-zinc-700/60 font-semibold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800/40 border-transparent'
-              }`}
-            >
-              <BookOpen className="h-4 w-4" /> API Docs
             </Link>
           </nav>
         </div>
