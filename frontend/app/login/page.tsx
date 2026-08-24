@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { ArrowRight, Lock, Mail, ArrowLeft, KeyRound, Sparkles } from 'lucide-react';
+import { ArrowRight, Lock, Mail, ArrowLeft, KeyRound } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function LoginPage() {
@@ -30,12 +30,6 @@ export default function LoginPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemoAccount = () => {
-    setEmail('seller@store.com');
-    setPassword('seller123');
-    setError('');
   };
 
   return (
@@ -115,17 +109,6 @@ export default function LoginPage() {
                 {loading ? 'Signing in...' : 'Sign In to Dashboard'} <ArrowRight className="h-4 w-4" />
               </button>
             </form>
-
-            {/* Quick Demo Account Auto-Fill */}
-            <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800/80">
-              <button
-                type="button"
-                onClick={fillDemoAccount}
-                className="w-full py-2 px-3 bg-zinc-100 dark:bg-[#18181b] hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-300 dark:border-zinc-700/60 rounded-lg text-xs font-mono text-zinc-700 dark:text-zinc-300 flex items-center justify-center gap-2 transition-colors"
-              >
-                <Sparkles className="h-3.5 w-3.5 text-emerald-500" /> Auto-fill Demo Account (seller@store.com)
-              </button>
-            </div>
 
             <div className="text-center text-xs text-zinc-500 pt-1">
               <span>Don't have an account? </span>

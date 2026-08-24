@@ -2,7 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Search, AlertTriangle, Star, Activity, Key, Terminal, ArrowUpRight, Copy, Check, Filter } from 'lucide-react';
+import Link from 'next/link';
 import api from '@/lib/api';
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 export default function DashboardPage() {
   const [keyword, setKeyword] = useState('Headphone Bluetooth Wireless');
@@ -10,7 +13,11 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [activeSeverity, setActiveSeverity] = useState('all');
   const [copied, setCopied] = useState(false);
-  const [activeApiKey, setActiveApiKey] = useState('rp_demo_key_1234567890');
+  // The API key is never re-fetched from the server (it's only returned once,
+  // at creation time — see /dashboard/api-keys). We persist the last-created
+  // key in this browser's localStorage so this page can reuse it.
+  const [activeApiKey, setActiveApiKey] = useState('');
+  const [analyzeError, setAnalyzeError] = useState('');
 
   const [analysis, setAnalysis] = useState<any>({
     product_name: 'Headphone Bluetooth Wireless',
@@ -40,27 +47,19 @@ export default function DashboardPage() {
   });
 
   useEffect(() => {
-    // Attempt to load the user's active API key
-    const loadKey = async () => {
-      try {
-        const res = await api.get('/user/api-keys');
-        if (res.data && res.data.apiKeys && res.data.apiKeys.length > 0) {
-          const firstKey = res.data.apiKeys.find((k: any) => k.is_active);
-          if (firstKey && firstKey.key) {
-            setActiveApiKey(firstKey.key);
-          }
-        }
-      } catch (e) {
-        // use default fallback
-      }
-    };
-    loadKey();
+    setActiveApiKey(localStorage.getItem('rp_active_api_key') || '');
   }, []);
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!keyword) return;
 
+    if (!activeApiKey) {
+      setAnalyzeError('No API key set for this browser. Generate one in Developer Tokens first.');
+      return;
+    }
+
+    setAnalyzeError('');
     setLoading(true);
     try {
       const res = await api.post('/review/analyze', { keyword, platform }, {
@@ -69,8 +68,8 @@ export default function DashboardPage() {
       if (res.data && res.data.data) {
         setAnalysis(res.data.data);
       }
-    } catch (err) {
-      console.log('Error analyzing reviews, using cached state');
+    } catch (err: any) {
+      setAnalyzeError(err.response?.data?.message || 'Failed to analyze reviews.');
     } finally {
       setLoading(false);
     }
@@ -83,7 +82,7 @@ export default function DashboardPage() {
   });
 
   const copyCurl = () => {
-    navigator.clipboard.writeText(`curl -X POST http://localhost:8000/api/v1/review/analyze -H "X-API-KEY: ${activeApiKey}" -H "Content-Type: application/json" -d '{"keyword": "${keyword}", "platform": "${platform}"}'`);
+    navigator.clipboard.writeText(`curl -X POST ${API_BASE_URL}/review/analyze -H "X-API-KEY: ${activeApiKey || '<your_api_key>'}" -H "Content-Type: application/json" -d '{"keyword": "${keyword}", "platform": "${platform}"}'`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -101,6 +100,18 @@ export default function DashboardPage() {
           <span className="font-mono text-xs text-zinc-500 dark:text-zinc-400">REST API v1.0 Operational</span>
         </div>
       </div>
+
+      {!activeApiKey && (
+        <div className="flex items-center justify-between gap-3 bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs px-4 py-3 rounded-xl">
+          <span>No API key set for this browser yet — analyze won't work until you generate one.</span>
+          <Link href="/dashboard/api-keys" className="font-bold underline shrink-0">Generate a key &rarr;</Link>
+        </div>
+      )}
+      {analyzeError && (
+        <div className="bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 text-xs px-4 py-3 rounded-xl">
+          {analyzeError}
+        </div>
+      )}
 
       {/* Search Input Bar */}
       <form onSubmit={handleAnalyze} className="flex gap-3 bg-white dark:bg-[#121215] p-3 rounded-xl border border-zinc-200 dark:border-zinc-800/80 shadow-sm">
@@ -169,8 +180,10 @@ export default function DashboardPage() {
             <span className="font-mono uppercase text-xs font-semibold">Developer Auth</span>
             <Key className="h-4 w-4 text-emerald-500" />
           </div>
-          <div className="text-sm font-mono text-emerald-600 dark:text-emerald-400 truncate">{activeApiKey.substring(0, 12)}...</div>
-          <div className="text-xs text-zinc-500 font-mono">X-API-KEY Active</div>
+          <div className="text-sm font-mono text-emerald-600 dark:text-emerald-400 truncate">
+            {activeApiKey ? `${activeApiKey.substring(0, 12)}...` : 'Not set'}
+          </div>
+          <div className="text-xs text-zinc-500 font-mono">{activeApiKey ? 'X-API-KEY Active' : 'Generate a key to activate'}</div>
         </div>
       </div>
 
@@ -262,7 +275,7 @@ export default function DashboardPage() {
           </button>
         </div>
         <div className="bg-zinc-900 text-emerald-400 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto leading-relaxed">
-          curl -X POST http://localhost:8000/api/v1/review/analyze -H "X-API-KEY: {activeApiKey}" -H "Content-Type: application/json" -d '&#123; "keyword": "{keyword}", "platform": "{platform}" &#125;'
+          curl -X POST {API_BASE_URL}/review/analyze -H "X-API-KEY: {activeApiKey || '<your_api_key>'}" -H "Content-Type: application/json" -d '&#123; "keyword": "{keyword}", "platform": "{platform}" &#125;'
         </div>
       </div>
     </div>

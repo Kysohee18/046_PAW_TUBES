@@ -37,6 +37,9 @@ export default function ApiKeysPage() {
       const res = await api.post('/user/api-keys', { name: keyName || 'Production Store Key' });
       if (res.data && res.data.apiKey) {
         setNewlyCreatedKey(res.data.apiKey.key);
+        // Persist locally so the Dashboard's Analyze page can reuse it —
+        // the server never returns this raw key again after this response.
+        localStorage.setItem('rp_active_api_key', res.data.apiKey.key);
         setKeyName('');
         fetchKeys();
       }
@@ -47,10 +50,14 @@ export default function ApiKeysPage() {
     }
   };
 
-  const handleRevoke = async (keyId: number) => {
+  const handleRevoke = async (keyId: number, keyPrefix: string) => {
     if (!confirm('Are you sure you want to revoke this API key? Applications using it will lose access.')) return;
     try {
       await api.delete(`/user/api-keys/${keyId}`);
+      const stored = localStorage.getItem('rp_active_api_key');
+      if (stored && stored.startsWith(keyPrefix)) {
+        localStorage.removeItem('rp_active_api_key');
+      }
       fetchKeys();
     } catch (err) {
       alert('Failed to revoke key');
@@ -185,7 +192,7 @@ export default function ApiKeysPage() {
                   <td className="p-3.5 text-right space-x-2">
                     {k.is_active && (
                       <button
-                        onClick={() => handleRevoke(k.id)}
+                        onClick={() => handleRevoke(k.id, k.key_prefix)}
                         className="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 rounded border border-rose-500/20 inline-flex items-center gap-1 text-xs"
                       >
                         <Trash2 className="h-3 w-3" /> Revoke

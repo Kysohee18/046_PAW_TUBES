@@ -16,7 +16,7 @@ export default function DocsPage() {
   };
 
   const curlExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/review/analyze \\
-  -H "X-API-KEY: rp_demo_key_1234567890" \\
+  -H "X-API-KEY: rp_your_api_key_here" \\
   -H "Content-Type: application/json" \\
   -d '{
     "keyword": "Headphone Wireless Bluetooth",
@@ -31,7 +31,7 @@ const response = await axios.post('https://046-paw-tubes.vercel.app/api/v1/revie
   productName: 'Headphone Wireless Bluetooth ANC',
   platform: 'shopee'
 }, {
-  headers: { 'X-API-KEY': 'rp_demo_key_1234567890' }
+  headers: { 'X-API-KEY': 'rp_your_api_key_here' }
 });
 
 console.log(response.data);`;
@@ -39,8 +39,8 @@ console.log(response.data);`;
   const registerExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/auth/register \\
   -H "Content-Type: application/json" \\
   -d '{
-    "email": "seller@store.com",
-    "password": "seller123",
+    "email": "you@example.com",
+    "password": "your_password",
     "fullName": "Demo Seller",
     "companyName": "TechStore ID"
   }'`;
@@ -48,8 +48,8 @@ console.log(response.data);`;
   const loginExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/auth/login \\
   -H "Content-Type: application/json" \\
   -d '{
-    "email": "seller@store.com",
-    "password": "seller123"
+    "email": "you@example.com",
+    "password": "your_password"
   }'`;
 
   const createKeyExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/user/api-keys \\
@@ -192,9 +192,9 @@ console.log(response.data);`;
               All requests to <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">/review/*</code> endpoints must contain your secret key in the <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">X-API-KEY</code> HTTP header. Get your key from the <Link href="/dashboard/api-keys" className="text-emerald-600 dark:text-emerald-400 underline">Dashboard &rarr; Developer Tokens</Link> page (requires login).
             </p>
             <div className="bg-[#121215] text-zinc-300 p-4 rounded-lg font-mono text-xs border border-zinc-800 flex items-center justify-between">
-              <span>X-API-KEY: rp_demo_key_1234567890</span>
+              <span>X-API-KEY: rp_your_api_key_here</span>
               <button
-                onClick={() => copyToClipboard('X-API-KEY: rp_demo_key_1234567890', 'key')}
+                onClick={() => copyToClipboard('X-API-KEY: rp_your_api_key_here', 'key')}
                 className="text-xs text-zinc-500 hover:text-white font-sans"
               >
                 {copiedCode === 'key' ? 'Copied!' : 'Copy Header'}
