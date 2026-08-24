@@ -1,0 +1,43 @@
+@startuml activity
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam activity {
+  BackgroundColor #ECFDF5
+  BorderColor #059669
+  FontColor #18181B
+  DiamondBackgroundColor #FEF3C7
+  DiamondBorderColor #D97706
+}
+skinparam ArrowColor #52525B
+
+title ReviewPulse SaaS — Activity Diagram / User Flow (POST /review/analyze)
+
+start
+:Consumer sends\nPOST /review/analyze;
+
+if (X-API-KEY header present?) then (no)
+  :401 Unauthorized;
+  stop
+else (yes)
+endif
+
+if (Key valid, active,\nunder quota?) then (no)
+  :403 Forbidden /\n429 Too Many Requests;
+  stop
+else (yes)
+endif
+
+if (Keyword cached\n< 24h old?) then (yes)
+  :Read cached row\nfrom product_analyses;
+else (no)
+  :Sample reviews from\nreviewSeed dataset;
+  :Run VADER sentiment +\naspect flaw extraction;
+  :Compute CSAT per aspect +\nrank action items;
+  :Insert new row into\nproduct_analyses;
+endif
+
+:Log usage_logs entry;
+:Return 200 OK\n(cached: true/false);
+stop
+
+@enduml

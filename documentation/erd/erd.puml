@@ -1,0 +1,83 @@
+@startuml erd
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam linetype ortho
+skinparam roundcorner 6
+skinparam entity {
+  BackgroundColor #FFFFFF
+  BorderColor #27272A
+  FontColor #18181B
+  FontName Helvetica
+}
+skinparam class {
+  AttributeFontSize 12
+  FontSize 13
+}
+
+title ReviewPulse SaaS — Entity Relationship Diagram
+
+entity "users" as users {
+  * id : SERIAL <<PK>>
+  --
+  * email : VARCHAR(255) <<UK>>
+  * password_hash : VARCHAR(255)
+  * full_name : VARCHAR(255)
+  company_name : VARCHAR(255)
+  role : VARCHAR(50) = 'seller'
+  created_at : TIMESTAMPTZ
+}
+
+entity "api_keys" as api_keys {
+  * id : SERIAL <<PK>>
+  --
+  * user_id : INT <<FK>>
+  * key : VARCHAR(255) <<UK>>
+  * name : VARCHAR(100)
+  * key_prefix : VARCHAR(10)
+  usage_limit : INT = 1000
+  usage_count : INT = 0
+  is_active : BOOLEAN = true
+  created_at : TIMESTAMPTZ
+  last_used : TIMESTAMPTZ
+}
+
+entity "usage_logs" as usage_logs {
+  * id : SERIAL <<PK>>
+  --
+  * user_id : INT <<FK>>
+  * api_key_id : INT <<FK>>
+  endpoint : VARCHAR(255)
+  method : VARCHAR(10)
+  response_time : NUMERIC(10,4)
+  status_code : INT
+  created_at : TIMESTAMPTZ
+}
+
+entity "product_analyses" as product_analyses {
+  * id : SERIAL <<PK>>
+  --
+  keyword : VARCHAR(255)
+  product_name : VARCHAR(255)
+  platform : VARCHAR(50)
+  total_reviews : INT
+  positive_count : INT
+  negative_count : INT
+  neutral_count : INT
+  average_csat : NUMERIC(3,2)
+  flaws_detected : JSONB
+  feature_csat : JSONB
+  ai_action_items : JSONB
+  created_at : TIMESTAMPTZ
+}
+
+users ||--o{ api_keys : "generates"
+users ||--o{ usage_logs : "performs"
+api_keys ||--o{ usage_logs : "authorizes"
+
+note right of product_analyses
+  Not linked by foreign key.
+  Cached by <b>keyword</b>, shared
+  across every caller (24h TTL).
+end note
+
+@enduml

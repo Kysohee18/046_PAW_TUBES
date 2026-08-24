@@ -1,0 +1,44 @@
+@startuml usecase
+!theme plain
+left to right direction
+skinparam backgroundColor #FFFFFF
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #ECFDF5
+  BorderColor #059669
+  FontColor #18181B
+}
+skinparam rectangle {
+  BackgroundColor #FAFAFA
+  BorderColor #27272A
+}
+
+title ReviewPulse SaaS — Use Case Diagram
+
+actor "Seller" as Seller
+actor "API Consumer" as Consumer
+
+rectangle "ReviewPulse" {
+  usecase "Register account" as UC1
+  usecase "Log in" as UC2
+  usecase "Generate API key" as UC3
+  usecase "List / revoke API keys" as UC4
+  usecase "Analyze product reviews" as UC5
+  usecase "View analysis history" as UC6
+  usecase "Read API documentation" as UC7
+}
+
+Seller --> UC1
+Seller --> UC2
+Seller --> UC3
+Seller --> UC4
+Seller --> UC6
+Seller --> UC7
+Consumer --> UC5
+Consumer --> UC6
+
+UC3 ..> UC2 : <<requires>>
+UC4 ..> UC2 : <<requires>>
+UC5 ..> UC3 : <<requires>>
+
+@enduml
