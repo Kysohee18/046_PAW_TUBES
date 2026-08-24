@@ -30,13 +30,10 @@ export default function DashboardLayout({
   };
 
   if (isAuthenticated === null) {
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 flex items-center justify-center font-sans">
-        <div className="flex items-center gap-3 text-sm text-zinc-500 font-mono">
-          <span className="w-3 h-3 rounded-full bg-emerald-500 animate-ping" /> Verifying Authentication Token...
-        </div>
-      </div>
-    );
+    // Intentionally blank: this route requires a token, and until the
+    // client-side check above resolves, nothing about the dashboard
+    // (nav, layout, data) should be visible or implied.
+    return <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b]" />;
   }
 
   return (
