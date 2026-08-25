@@ -31,6 +31,12 @@ dist/
 *.md
 !README.md
 
+# Laporan submission (dikumpulkan terpisah, bukan bagian repo)
+documentation/Laporan_Desain_Sistem_ReviewPulse.docx
+documentation/Laporan_Desain_Sistem_ReviewPulse.tex
+documentation/Laporan_Desain_Sistem_ReviewPulse.pdf
+~$*.docx
+
 # Operating System Files
 .DS_Store
 Thumbs.db
