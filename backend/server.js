@@ -9,6 +9,10 @@ const apiRouter = require('./routes/api');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// Vercel always sets X-Forwarded-For -- trust it so express-rate-limit can
+// read the real client IP instead of throwing ERR_ERL_UNEXPECTED_X_FORWARDED_FOR.
+app.set('trust proxy', 1);
+
 // Rate limiting (200 requests per 15 minutes window)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
