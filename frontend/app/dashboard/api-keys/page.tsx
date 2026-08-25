@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Key, Plus, ShieldCheck, Trash2, RefreshCw } from 'lucide-react';
+import { Key, Plus, ShieldCheck, Trash2, RefreshCw, Copy, Check } from 'lucide-react';
 import api from '@/lib/api';
 
 export default function ApiKeysPage() {
@@ -11,6 +11,18 @@ export default function ApiKeysPage() {
   const [keyName, setKeyName] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [newlyCreatedKey, setNewlyCreatedKey] = useState<string | null>(null);
+  const [jwtToken, setJwtToken] = useState('');
+  const [jwtCopied, setJwtCopied] = useState(false);
+
+  useEffect(() => {
+    setJwtToken(localStorage.getItem('rp_token') || '');
+  }, []);
+
+  const copyJwt = () => {
+    navigator.clipboard.writeText(jwtToken);
+    setJwtCopied(true);
+    setTimeout(() => setJwtCopied(false), 2000);
+  };
 
   const fetchKeys = async () => {
     setLoading(true);
@@ -77,6 +89,26 @@ export default function ApiKeysPage() {
         >
           <Plus className="h-4 w-4" /> Generate New API Key
         </button>
+      </div>
+
+      <div className="bg-white dark:bg-[#121215] border border-zinc-200 dark:border-zinc-800/80 rounded-xl p-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-zinc-900 dark:text-white flex items-center gap-1.5">
+            <Key className="h-3.5 w-3.5 text-emerald-500" /> Current Session JWT
+          </span>
+          <button
+            onClick={copyJwt}
+            disabled={!jwtToken}
+            className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white disabled:opacity-40 font-medium"
+          >
+            {jwtCopied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+            {jwtCopied ? 'Copied' : 'Copy'}
+          </button>
+        </div>
+        <p className="text-[11px] text-zinc-500 dark:text-zinc-400">This is your <code className="bg-zinc-100 dark:bg-zinc-900 px-1 rounded font-mono">Authorization: Bearer</code> token for this browser session — use it to test protected routes (e.g. in Postman) without logging in again there. Expires 7 days after login.</p>
+        <div className="bg-zinc-100 dark:bg-[#18181b] border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 font-mono text-[11px] text-zinc-600 dark:text-zinc-400 break-all">
+          {jwtToken || 'No active session token found.'}
+        </div>
       </div>
 
       <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl flex items-center gap-3 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm">
