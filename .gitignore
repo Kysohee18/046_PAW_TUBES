@@ -37,6 +37,9 @@ documentation/Laporan_Desain_Sistem_ReviewPulse.tex
 documentation/Laporan_Desain_Sistem_ReviewPulse.pdf
 ~$*.docx
 
+# Postman collection (isinya credential asli buat testing pribadi)
+ReviewPulse.postman_collection.json
+
 # Operating System Files
 .DS_Store
 Thumbs.db
