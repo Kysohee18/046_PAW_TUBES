@@ -1,0 +1,187 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { ShoppingBag, Terminal, Key, BookOpen, ArrowLeft, Copy, Check, Code, Shield, HelpCircle } from 'lucide-react';
+
+export default function DocsPage() {
+  const [activeSection, setActiveSection] = useState('overview');
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string, id: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedCode(id);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  const curlExample = `curl -X POST http://localhost:8000/api/v1/review/analyze \\
+  -H "X-API-KEY: rp_demo_key_1234567890" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "keyword": "Headphone Wireless Bluetooth",
+    "platform": "shopee"
+  }'`;
+
+  const nodeExample = `const axios = require('axios');
+
+const response = await axios.post('http://localhost:8000/api/v1/review/analyze', {
+  keyword: 'Headphone Wireless Bluetooth',
+  platform: 'shopee'
+}, {
+  headers: { 'X-API-KEY': 'rp_demo_key_1234567890' }
+});
+
+console.log(response.data);`;
+
+  return (
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090b] text-zinc-900 dark:text-zinc-100 font-sans">
+      {/* Standardized Header */}
+      <header className="border-b border-zinc-200 dark:border-zinc-800/80 bg-zinc-50/90 dark:bg-[#09090b]/90 backdrop-blur sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <span className="font-semibold text-sm tracking-tight text-zinc-900 dark:text-white">ReviewPulse</span>
+            </Link>
+            <span className="text-xs font-mono text-zinc-400 border-l border-zinc-300 dark:border-zinc-800 pl-3">API Documentation v1.0</span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link href="/dashboard">
+              <button className="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white font-medium">
+                <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
+              </button>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Documentation Container */}
+      <div className="max-w-7xl mx-auto px-6 py-8 flex gap-8">
+        {/* Production Topic Navigation Sidebar */}
+        <aside className="w-56 shrink-0 space-y-6 hidden md:block">
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-semibold px-2">Getting Started</span>
+            <nav className="space-y-0.5 text-xs font-medium">
+              <button
+                onClick={() => setActiveSection('overview')}
+                className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'overview' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+              >
+                Overview
+              </button>
+              <button
+                onClick={() => setActiveSection('authentication')}
+                className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'authentication' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+              >
+                Authentication & Keys
+              </button>
+            </nav>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-semibold px-2">Endpoints Reference</span>
+            <nav className="space-y-0.5 text-xs font-medium">
+              <button
+                onClick={() => setActiveSection('endpoints')}
+                className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'endpoints' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+              >
+                POST /review/analyze
+              </button>
+            </nav>
+          </div>
+
+          <div className="space-y-1">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 font-semibold px-2">Code Examples</span>
+            <nav className="space-y-0.5 text-xs font-medium">
+              <button
+                onClick={() => setActiveSection('code')}
+                className={`w-full text-left px-3 py-1.5 rounded transition-colors ${activeSection === 'code' ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white font-bold' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white'}`}
+              >
+                cURL & Node.js
+              </button>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Content Body */}
+        <main className="flex-1 space-y-10 max-w-4xl">
+          {/* Section: Overview */}
+          <section id="overview" className="space-y-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-mono border border-emerald-500/20">
+              <BookOpen className="h-3.5 w-3.5" /> REST API v1.0 Production Standard
+            </div>
+            <h1 className="text-3xl font-extrabold text-zinc-900 dark:text-white">API Overview & Architecture</h1>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+              The ReviewPulse REST API allows e-commerce merchants and warehouse ERP developers to programmatically extract buyer complaint flaws, compute aspect CSAT ratings, and trigger automated quality control fix checklists for products sold on Shopee, Tokopedia, and Amazon.
+            </p>
+          </section>
+
+          {/* Section: Authentication */}
+          <section id="authentication" className="space-y-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-8">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              <Key className="h-5 w-5 text-emerald-500" /> API Authentication
+            </h2>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              All API requests must contain your secret developer key passed in the <code className="bg-zinc-100 dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded font-mono border border-zinc-300 dark:border-zinc-800">X-API-KEY</code> HTTP header.
+            </p>
+            <div className="bg-[#121215] text-zinc-300 p-4 rounded-lg font-mono text-xs border border-zinc-800 flex items-center justify-between">
+              <span>X-API-KEY: rp_demo_key_1234567890</span>
+              <button
+                onClick={() => copyToClipboard('X-API-KEY: rp_demo_key_1234567890', 'key')}
+                className="text-xs text-zinc-500 hover:text-white font-sans"
+              >
+                {copiedCode === 'key' ? 'Copied!' : 'Copy Header'}
+              </button>
+            </div>
+          </section>
+
+          {/* Section: Endpoint POST /review/analyze */}
+          <section id="endpoints" className="space-y-4 border-b border-zinc-200 dark:border-zinc-800/80 pb-8">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-white flex items-center gap-2">
+              <Terminal className="h-5 w-5 text-cyan-500" /> POST /api/v1/review/analyze
+            </h2>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">
+              Extract product complaint flaws and calculate CSAT ratings for a specific product keyword or store URL.
+            </p>
+
+            {/* Code Box: cURL */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-zinc-500 uppercase font-semibold">cURL Request</span>
+                <button
+                  onClick={() => copyToClipboard(curlExample, 'curl')}
+                  className="text-xs text-emerald-500 font-mono flex items-center gap-1 hover:underline"
+                >
+                  {copiedCode === 'curl' ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  {copiedCode === 'curl' ? 'Copied' : 'Copy Code'}
+                </button>
+              </div>
+              <pre className="bg-[#09090b] text-emerald-400 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto">
+                {curlExample}
+              </pre>
+            </div>
+
+            {/* Code Box: Node.js */}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono text-zinc-500 uppercase font-semibold">Node.js (Axios) Request</span>
+                <button
+                  onClick={() => copyToClipboard(nodeExample, 'node')}
+                  className="text-xs text-emerald-500 font-mono flex items-center gap-1 hover:underline"
+                >
+                  {copiedCode === 'node' ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                  {copiedCode === 'node' ? 'Copied' : 'Copy Code'}
+                </button>
+              </div>
+              <pre className="bg-[#09090b] text-zinc-300 p-4 rounded-lg font-mono text-xs border border-zinc-800 overflow-x-auto">
+                {nodeExample}
+              </pre>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  );
+}
