@@ -69,8 +69,9 @@ One GitHub repository, two independent Vercel projects (Root Directory set per p
 |---|---|---|
 | **Seller** (dashboard user) | JWT, `Authorization: Bearer <token>` | Register, log in, generate/list/revoke their own API keys, browse analysis history and API docs in the browser |
 | **API Consumer** (external client) | API key, `X-API-KEY` header | Call `POST /review/analyze` and `GET /review/history` — no login session, no dashboard access |
+| **Admin** (`role: 'admin'` on `users`) | JWT, same `Authorization: Bearer <token>` as a Seller, plus a `requireAdmin` role check | Everything a Seller can do, plus: list every user, list every API key across all accounts, view system-wide usage logs, revoke any user's key |
 
-These two credentials are deliberately not interchangeable: a JWT never authorizes `/review/analyze`, and an API key never authorizes the key-management routes. See `documentation/usecase/`.
+These credentials are deliberately not interchangeable: a JWT never authorizes `/review/analyze`, and an API key never authorizes the key-management routes. Admin is not a separate credential type — it's the same JWT with a `role` claim checked on top, so there's no public "become admin" endpoint; the role is only ever set directly in the database. See `documentation/usecase/`.
 
 ---
 
@@ -96,7 +97,16 @@ Base URL: `https://046-paw-tubes-v2-backend.vercel.app/api/v1` (plus `GET /healt
 | `DELETE` | `/user/api-keys/:keyId` | JWT Bearer | Revoke a key immediately |
 | `POST` | `/review/analyze` | `X-API-KEY` | The core data endpoint — analyze reviews for a `keyword` + `platform` |
 
-Full request/response examples: `https://046-paw-tubes-v2-frontend.vercel.app/docs`.
+### Admin-only endpoints
+
+| Method | Path | Auth required | Purpose |
+|---|---|---|---|
+| `GET` | `/admin/users` | JWT Bearer + `role: admin` | List every registered user (`password_hash` excluded) |
+| `GET` | `/admin/api-keys` | JWT Bearer + `role: admin` | List every API key across all accounts (raw `key` excluded, owner email/name included) |
+| `GET` | `/admin/usage-logs` | JWT Bearer + `role: admin` | Most recent 200 usage log entries, system-wide |
+| `DELETE` | `/admin/api-keys/:keyId` | JWT Bearer + `role: admin` | Revoke any user's API key, not just the caller's own |
+
+A non-admin JWT gets `403 Admin Access Required` on all four. Full request/response examples: `https://046-paw-tubes-v2-frontend.vercel.app/docs`.
 
 ---
 

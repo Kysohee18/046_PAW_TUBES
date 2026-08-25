@@ -17,6 +17,7 @@ title ReviewPulse SaaS — Use Case Diagram
 
 actor "Seller" as Seller
 actor "API Consumer" as Consumer
+actor "Admin" as Admin
 
 rectangle "ReviewPulse" {
   usecase "Register account" as UC1
@@ -26,6 +27,10 @@ rectangle "ReviewPulse" {
   usecase "Analyze product reviews" as UC5
   usecase "View analysis history" as UC6
   usecase "Read API documentation" as UC7
+  usecase "List all users" as UC8
+  usecase "List all API keys (any user)" as UC9
+  usecase "View system-wide usage logs" as UC10
+  usecase "Revoke any user's API key" as UC11
 }
 
 Seller --> UC1
@@ -37,8 +42,18 @@ Seller --> UC7
 Consumer --> UC5
 Consumer --> UC6
 
+Admin --|> Seller
+Admin --> UC8
+Admin --> UC9
+Admin --> UC10
+Admin --> UC11
+
 UC3 ..> UC2 : <<requires>>
 UC4 ..> UC2 : <<requires>>
 UC5 ..> UC3 : <<requires>>
+UC8 ..> UC2 : <<requires>>
+UC9 ..> UC2 : <<requires>>
+UC10 ..> UC2 : <<requires>>
+UC11 ..> UC2 : <<requires>>
 
 @enduml
