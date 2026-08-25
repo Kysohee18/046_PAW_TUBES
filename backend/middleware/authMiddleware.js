@@ -49,4 +49,11 @@ const verifyApiKey = async (req, res, next) => {
     }
 };
 
-module.exports = { verifyToken, verifyApiKey };
+const requireAdmin = (req, res, next) => {
+    if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ status: 'error', message: 'Admin Access Required' });
+    }
+    next();
+};
+
+module.exports = { verifyToken, verifyApiKey, requireAdmin };
