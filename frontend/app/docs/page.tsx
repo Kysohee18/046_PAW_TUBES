@@ -41,7 +41,7 @@ export default function DocsPage() {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
-  const curlExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/review/analyze \\
+  const curlExample = `curl -X POST https://046-paw-tubes-v2-backend.vercel.app/api/v1/review/analyze \\
   -H "X-API-KEY: rp_your_api_key_here" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -53,14 +53,14 @@ export default function DocsPage() {
   const nodeExample = `const axios = require('axios');
 
 const { data } = await axios.post(
-  'https://046-paw-tubes.vercel.app/api/v1/review/analyze',
+  'https://046-paw-tubes-v2-backend.vercel.app/api/v1/review/analyze',
   { keyword: 'Headphone Wireless Bluetooth', platform: 'shopee' },
   { headers: { 'X-API-KEY': process.env.REVIEWPULSE_KEY } }
 );
 
 console.log(data.data.flaws_detected);`;
 
-  const registerExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/auth/register \\
+  const registerExample = `curl -X POST https://046-paw-tubes-v2-backend.vercel.app/api/v1/auth/register \\
   -H "Content-Type: application/json" \\
   -d '{
     "email": "you@example.com",
@@ -69,14 +69,14 @@ console.log(data.data.flaws_detected);`;
     "companyName": "Your Store"
   }'`;
 
-  const loginExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/auth/login \\
+  const loginExample = `curl -X POST https://046-paw-tubes-v2-backend.vercel.app/api/v1/auth/login \\
   -H "Content-Type: application/json" \\
   -d '{
     "email": "you@example.com",
     "password": "your_password"
   }'`;
 
-  const createKeyExample = `curl -X POST https://046-paw-tubes.vercel.app/api/v1/user/api-keys \\
+  const createKeyExample = `curl -X POST https://046-paw-tubes-v2-backend.vercel.app/api/v1/user/api-keys \\
   -H "Authorization: Bearer <your_jwt>" \\
   -H "Content-Type: application/json" \\
   -d '{ "name": "Production Key" }'`;
@@ -164,7 +164,7 @@ console.log(data.data.flaws_detected);`;
             </p>
             <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 dark:text-zinc-400 pt-1">
               <span className="text-zinc-400 dark:text-zinc-600">Base URL</span>
-              <code className="bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800">https://046-paw-tubes.vercel.app/api/v1</code>
+              <code className="bg-zinc-100 dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 px-2 py-1 rounded border border-zinc-200 dark:border-zinc-800">https://046-paw-tubes-v2-backend.vercel.app/api/v1</code>
             </div>
           </section>
 

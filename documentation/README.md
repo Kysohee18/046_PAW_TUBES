@@ -3,9 +3,9 @@
 A REST API that turns raw e-commerce buyer reviews into structured defect data. Send a product keyword, get back which aspect of the product people are complaining about, a CSAT score per aspect, and a ranked list of fixes — gated by an API key, the same pattern as OpenRouter or a weather API.
 
 **Live**
-- API: `https://046-paw-tubes.vercel.app/api/v1`
-- Dashboard: `https://046-paw-tubes-gjac.vercel.app`
-- API docs: `https://046-paw-tubes-gjac.vercel.app/docs`
+- API: `https://046-paw-tubes-v2-backend.vercel.app/api/v1`
+- Dashboard: `https://046-paw-tubes-v2-frontend.vercel.app`
+- API docs: `https://046-paw-tubes-v2-frontend.vercel.app/docs`
 
 ---
 
@@ -76,7 +76,7 @@ These two credentials are deliberately not interchangeable: a JWT never authoriz
 
 ## API endpoints
 
-Base URL: `https://046-paw-tubes.vercel.app/api/v1` (plus `GET /health` at the domain root, outside the `/api/v1` prefix).
+Base URL: `https://046-paw-tubes-v2-backend.vercel.app/api/v1` (plus `GET /health` at the domain root, outside the `/api/v1` prefix).
 
 ### Public endpoints (no credentials required)
 
@@ -96,7 +96,7 @@ Base URL: `https://046-paw-tubes.vercel.app/api/v1` (plus `GET /health` at the d
 | `DELETE` | `/user/api-keys/:keyId` | JWT Bearer | Revoke a key immediately |
 | `POST` | `/review/analyze` | `X-API-KEY` | The core data endpoint — analyze reviews for a `keyword` + `platform` |
 
-Full request/response examples: `https://046-paw-tubes-gjac.vercel.app/docs`.
+Full request/response examples: `https://046-paw-tubes-v2-frontend.vercel.app/docs`.
 
 ---
 

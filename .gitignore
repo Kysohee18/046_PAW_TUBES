@@ -27,9 +27,10 @@ dist/
 .vercel/
 */.vercel/
 
-# Markdown docs (keep only README.md tracked)
+# Markdown docs (keep only README.md and penjelasan-backend.md tracked)
 *.md
 !README.md
+!penjelasan-backend.md
 
 # Operating System Files
 .DS_Store

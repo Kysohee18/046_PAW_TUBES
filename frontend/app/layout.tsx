@@ -5,7 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ReviewPulse SaaS - E-Commerce Review & Flaw Intelligence",
   description: "AI-Powered Customer Review Flaw Extractor & CSAT Rating Analytics",
-  metadataBase: new URL("https://046-paw-tubes-gjac.vercel.app"),
+  metadataBase: new URL("https://046-paw-tubes-v2-frontend.vercel.app"),
   openGraph: {
     title: "ReviewPulse SaaS",
     description: "AI-Powered Customer Review Flaw Extractor & CSAT Rating Analytics",
